@@ -38,6 +38,11 @@ Route.get('/testparams/:userId?', async ({ params }) => {
   cast: (userId) => Number(userId)
 })
 
+/*Authentication Routes*/
+Route.post('/register', 'AuthController.register')
+
+Route.post('/login', 'AuthController.login')
+
 /*Posts Routes*/
 Route.get('/posts', 'PostsController.showAll')
 
@@ -67,4 +72,4 @@ Route.get('/users/:id', 'UsersController.show').where('id', {
 
 Route.post('/users', 'UsersController.create')
 
-Route.delete('/users/:id', 'UsersController.delete')
+Route.delete('/users/:id', 'UsersController.destroy')
