@@ -39,7 +39,6 @@ export default class AuthController {
     public async login({ request, response, auth }: HttpContextContract) {
         //return response.send('you tried to login as an user!')
         const { uid, password } = request.only(['uid', 'password'])
-        console.log('TEST: ' + uid + ' ' + password)
 
         try {
             const token = await auth.use('api').attempt(uid, password, {
