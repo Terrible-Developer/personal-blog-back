@@ -18,27 +18,21 @@ export default class UsersController {
 
     public async create(request: HttpContext) {
         const params = request.request.requestBody
-        const hashedPassword = Hash.make(params.password)
-        const userId = await User.create({ username: params.username, password: hashedPassword, email: params.email})
-        //const userId = await Database
-        //    .table('users')
-        //    .insert({
-        //        username: params.username,
-        //        password: params.password,
-        //        email: params.email
-        //    })
-        //    .returning('id')
+        const userId = await User.create({ username: params.username, password: params.password, email: params.email})
         return userId
     }
 
     public async destroy(request: HttpContext) {
         const user = await User.find(request.params.id)
+        console.log('Trying to delete user ' + user?.id)
         await user?.delete().then(() => {
+            console.log('worked?')
             //return 'User ' + user.username + 'successfully deleted!'
             return {
                 "Success": "User " + user.username + "successfully deleted!"
             }
         }).catch(e => {
+            console.log(e)
             return e
         })
     }

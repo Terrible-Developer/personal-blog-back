@@ -42,7 +42,9 @@ export default class AuthController {
         console.log('TEST: ' + uid + ' ' + password)
 
         try {
-            const token = await auth.use('api').attempt(uid, password)
+            const token = await auth.use('api').attempt(uid, password, {
+                expiresIn: '1day'
+            })
             return token
         } catch(e) {
             console.log(e)

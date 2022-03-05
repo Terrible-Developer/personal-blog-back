@@ -19,6 +19,7 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
+import HealthCheck from '@ioc:Adonis/Core/HealthCheck'
 
 /*Testing and miscelaneous routes*/
 
@@ -36,6 +37,20 @@ Route.get('/testparams/:userId?', async ({ params }) => {
 }).where('userId', {
   match: /^[0-9]+$/,
   cast: (userId) => Number(userId)
+})
+
+Route.group(() => {
+  Route.get('/authtest', async ({ auth }) => {
+    await auth.use('api').authenticate()
+    console.log(auth.use('api').user!)
+  })
+}).middleware('auth:api')
+
+
+Route.get('/healthcheck', async ({ response }) => {
+  const report = await HealthCheck.getReport()
+
+  return report.healthy ? response.ok(report) : response.badRequest(report)
 })
 
 /*Authentication Routes*/
