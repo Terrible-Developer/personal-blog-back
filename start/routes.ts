@@ -78,13 +78,24 @@ Route.delete('/posts/:id', 'PostsController.delete')
 
 
 /*User Routes*/
-Route.get('/users', 'UsersController.showAll')
+Route.group(() => {
+  Route.get('/users', 'UsersController.showAll')
+
+  Route.get('/users/:id', 'UsersController.show').where('id', {
+    match: /^[0-9]+$/,
+    cast: (id) => Number(id)
+  })
+
+  Route.delete('/users/:id', 'UsersController.destroy')
+}).middleware('auth:api')
+
+/*Route.get('/users', 'UsersController.showAll')
 
 Route.get('/users/:id', 'UsersController.show').where('id', {
   match: /^[0-9]+$/,
   cast: (id) => Number(id)
-})
+})*/
 
 Route.post('/users', 'UsersController.create')
 
-Route.delete('/users/:id', 'UsersController.destroy')
+//Route.delete('/users/:id', 'UsersController.destroy')
