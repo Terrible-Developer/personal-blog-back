@@ -18,7 +18,7 @@ export default class UsersController {
 
     public async create(request: HttpContext) {
         const params = request.request.requestBody
-        const userId = await User.create({ username: params.username, password: params.password, email: params.email})
+        const userId = await User.create({ username: params.username, password: params.password, email: params.email, isAdmin: params.is_admin })
         return userId
     }
 

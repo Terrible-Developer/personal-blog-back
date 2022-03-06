@@ -19,6 +19,9 @@ export default class User extends BaseModel {
   @column()
   public rememberMeToken?: string
 
+  @column()
+  public isAdmin: boolean
+
   @hasMany(() => Post, { foreignKey: 'userId' })
   public posts: HasMany<typeof Post>
 
@@ -30,9 +33,7 @@ export default class User extends BaseModel {
 
   @beforeSave()
   public static async hashPassword(user: User) {
-    console.log('TEST HASHPASSWORD')
     if(user.$dirty.password) {
-      console.log('PASSWORD DIRTY')
       user.password = await Hash.make(user.password)
     }
   }
