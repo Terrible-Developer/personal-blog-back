@@ -44,7 +44,20 @@ export default class AuthController {
             const token = await auth.use('api').attempt(uid, password, {
                 expiresIn: '1day'
             })
-            return token
+
+            let user: User
+
+            if(uid.toString().includes('@'))
+                user = await User.findBy('email', uid)
+            else
+                user = await User.findBy('username', uid)
+
+            let userId = user.id
+
+            return {
+                token,
+                userId
+            } //token
         } catch(e) {
             console.log(e)
             return response.status(e.status | 500).send(e)
