@@ -89,7 +89,8 @@ Route.get('/users/:id', 'UsersController.show').where('id', {
   cast: (id) => Number(id)
 })
 
-Route.delete('/users/:id', 'UsersController.destroy')
+Route.get('/users/:username', 'UsersController.showByUsername')
+
 
 Route.get('/users/profile', async ({ auth }) => {
   await auth.use('api').authenticate()
@@ -106,4 +107,4 @@ Route.get('/users/profile', async ({ auth }) => {
 
 Route.post('/users', 'UsersController.create')
 
-//Route.delete('/users/:id', 'UsersController.destroy')
+Route.delete('/users/:id', 'UsersController.destroy')

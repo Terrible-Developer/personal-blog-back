@@ -12,7 +12,11 @@ export default class UsersController {
 
     public async show(request: HttpContext) {
         const user = await User.find(request.params.id)
-        console.log(request.params.id)
+        return user
+    }
+
+    public async showByUsername(request: HttpContext) {
+        const user = await User.findBy('username', request.params.username)
         return user
     }
 
@@ -24,10 +28,7 @@ export default class UsersController {
 
     public async destroy(request: HttpContext) {
         const user = await User.find(request.params.id)
-        console.log('Trying to delete user ' + user?.id)
         await user?.delete().then(() => {
-            console.log('worked?')
-            //return 'User ' + user.username + 'successfully deleted!'
             return {
                 "Success": "User " + user.username + "successfully deleted!"
             }
