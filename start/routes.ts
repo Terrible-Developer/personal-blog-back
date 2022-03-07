@@ -28,18 +28,6 @@ Route.get('/', async () => {
   return { hello: 'world' }
 })
 
-Route.get('/testparams', async () => {
-  return { test: 'route' }
-})
-
-Route.get('/testparams/:userId?', async ({ params }) => {
-  console.log(params)
-  return params.userId
-}).where('userId', {
-  match: /^[0-9]+$/,
-  cast: (userId) => Number(userId)
-})
-
 Route.get('/authadmin', async ({ auth }) => {
   await auth.use('api').authenticate()
   const user: User = await auth.use('api').user!
@@ -47,7 +35,6 @@ Route.get('/authadmin', async ({ auth }) => {
     isAdmin: user.isAdmin
   }
 })
-
 
 Route.get('/healthcheck', async ({ response }) => {
   const report = await HealthCheck.getReport()
@@ -89,9 +76,6 @@ Route.get('/users/:id', 'UsersController.show').where('id', {
   cast: (id) => Number(id)
 })
 
-Route.get('/users/:username', 'UsersController.showByUsername')
-
-
 Route.get('/users/profile', async ({ auth }) => {
   await auth.use('api').authenticate()
   const user: User = await auth.use('api').user!
@@ -104,6 +88,7 @@ Route.get('/users/profile', async ({ auth }) => {
   return responseInfo
 })
 
+Route.get('/users/profile/:username', 'UsersController.showByUsername')
 
 Route.post('/users', 'UsersController.create')
 
