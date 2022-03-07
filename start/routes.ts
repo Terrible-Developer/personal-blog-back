@@ -67,6 +67,12 @@ Route.post('/posts', 'PostsController.create')
 
 Route.delete('/posts/:id', 'PostsController.delete')
 
+Route.group(() => {
+  Route.get('/posts/like/:id', 'PostsController.likePost')
+
+  Route.get('/posts/hasuserliked/:id', 'PostsController.hasUserLikedPost')
+})
+
 
 /*User Routes*/
 Route.get('/users', 'UsersController.showAll')

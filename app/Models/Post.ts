@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+
+import PostLike from './PostLike'
 
 export default class Post extends BaseModel {
   @column({ isPrimary: true })
@@ -12,10 +14,16 @@ export default class Post extends BaseModel {
   public content: string
 
   @column()
+  public likes_quantity: number
+
+  @column()
   public tags: string[]
 
   @column({ columnName: 'userid' })
   public userid: number
+
+  @hasMany(() => PostLike, { foreignKey: 'postId' })
+  public postLikes: HasMany<typeof PostLike>
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

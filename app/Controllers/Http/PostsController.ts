@@ -2,6 +2,7 @@
 import { HttpContext } from '@adonisjs/http-server/build/standalone'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Post from 'App/Models/Post'
+import User from 'App/Models/User';
 
 export default class PostsController {
     public async showAll() {
@@ -44,5 +45,25 @@ export default class PostsController {
             return e
         })
 
+    }
+
+    public async likePost(request: HttpContext){
+
+    }
+
+    public async hasUserLikedPost({ params, auth }){
+        await auth.use('api').authenticate()
+        const user: User = await auth.use('api').user!
+        const postId = params.id
+
+        const hasLiked = await Database
+            .query()
+            .from('posts_like_users')
+            .where('userid', '=', user.id)
+            .andWhere('postid', '=', postId)
+        if(hasLiked.count > 0){
+            return true
+        }
+        return false
     }
 }
