@@ -1,3 +1,4 @@
+import { OpaqueTokenContract } from '@ioc:Adonis/Addons/Auth'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import User from 'App/Models/User'
@@ -41,26 +42,21 @@ export default class AuthController {
         const { uid, password } = request.only(['uid', 'password'])
 
         try {
-            const token = await auth.use('api').attempt(uid, password, {
+            const token: OpaqueTokenContract<User> = await auth.use('api').attempt(uid, password, {
                 expiresIn: '1day'
             })
 
-            let user: User
-
-            if(uid.toString().includes('@'))
-                user = await User.findBy('email', uid)
-            else
-                user = await User.findBy('username', uid)
-
-            let userId = user.id
-
-            return {
-                token,
-                userId
-            } //token
+            return token
         } catch(e) {
             console.log(e)
             return response.status(e.status | 500).send(e)
+        }
+    }
+
+    public async logout({ request, response, auth }: HttpContextContract) {
+        await auth.use('api').revoke()
+        return {
+            revoked: true
         }
     }
 }

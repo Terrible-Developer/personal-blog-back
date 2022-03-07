@@ -20,6 +20,7 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 import HealthCheck from '@ioc:Adonis/Core/HealthCheck'
+import User from 'App/Models/User'
 
 /*Testing and miscelaneous routes*/
 
@@ -39,12 +40,13 @@ Route.get('/testparams/:userId?', async ({ params }) => {
   cast: (userId) => Number(userId)
 })
 
-Route.group(() => {
-  Route.get('/authtest', async ({ auth }) => {
-    await auth.use('api').authenticate()
-    console.log(auth.use('api').user!)
-  })
-}).middleware('auth:api')
+Route.get('/authadmin', async ({ auth }) => {
+  await auth.use('api').authenticate()
+  const user: User = await auth.use('api').user!
+  return {
+    isAdmin: user.isAdmin
+  }
+})
 
 
 Route.get('/healthcheck', async ({ response }) => {
@@ -57,6 +59,8 @@ Route.get('/healthcheck', async ({ response }) => {
 Route.post('/register', 'AuthController.register')
 
 Route.post('/login', 'AuthController.login')
+
+Route.post('logout', 'AuthController.logout')
 
 /*Posts Routes*/
 Route.get('/posts', 'PostsController.showAll')
@@ -89,12 +93,18 @@ Route.group(() => {
   Route.delete('/users/:id', 'UsersController.destroy')
 }).middleware('auth:api')
 
-/*Route.get('/users', 'UsersController.showAll')
+Route.get('/users/profile', async ({ auth }) => {
+  await auth.use('api').authenticate()
+  const user: User = await auth.use('api').user!
 
-Route.get('/users/:id', 'UsersController.show').where('id', {
-  match: /^[0-9]+$/,
-  cast: (id) => Number(id)
-})*/
+  let responseInfo = {
+    username: user.username,
+    email: user.email,
+  }
+
+  return responseInfo
+})
+
 
 Route.post('/users', 'UsersController.create')
 
