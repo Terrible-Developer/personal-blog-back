@@ -82,16 +82,14 @@ Route.delete('/posts/:id', 'PostsController.delete')
 
 
 /*User Routes*/
-Route.group(() => {
-  Route.get('/users', 'UsersController.showAll')
+Route.get('/users', 'UsersController.showAll')
 
-  Route.get('/users/:id', 'UsersController.show').where('id', {
-    match: /^[0-9]+$/,
-    cast: (id) => Number(id)
-  })
+Route.get('/users/:id', 'UsersController.show').where('id', {
+  match: /^[0-9]+$/,
+  cast: (id) => Number(id)
+})
 
-  Route.delete('/users/:id', 'UsersController.destroy')
-}).middleware('auth:api')
+Route.delete('/users/:id', 'UsersController.destroy')
 
 Route.get('/users/profile', async ({ auth }) => {
   await auth.use('api').authenticate()
