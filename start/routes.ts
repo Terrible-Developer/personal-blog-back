@@ -42,6 +42,7 @@ Route.get('/healthcheck', async ({ response }) => {
   return report.healthy ? response.ok(report) : response.badRequest(report)
 })
 
+
 /*Authentication Routes*/
 Route.post('/register', 'AuthController.register')
 
