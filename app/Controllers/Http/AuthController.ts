@@ -29,7 +29,6 @@ export default class AuthController {
             return response.status(e.status | 500).send(e)
         }
 
-        return response
     }
 
 

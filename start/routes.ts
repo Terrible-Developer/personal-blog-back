@@ -88,6 +88,7 @@ Route.get('/users/profile', async ({ auth }) => {
   const user: User = await auth.use('api').user!
 
   let responseInfo = {
+    userid: user.id,
     username: user.username,
     email: user.email,
   }
