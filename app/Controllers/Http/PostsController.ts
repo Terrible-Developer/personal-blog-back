@@ -50,8 +50,9 @@ export default class PostsController {
       await post?.save().then(() => {
         return { "Success": "Post " + data.title + "successfully updated!" }
       });
+
       /*
-        Testei isso mas ta mt secco
+        Testei isso mas ta mt
         await Post
         .query()
         .where('id', request.params.postId)
