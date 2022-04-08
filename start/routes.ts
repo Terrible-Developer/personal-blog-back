@@ -66,6 +66,8 @@ Route.get('/posts/byuser/:userId', 'PostsController.showAllByUserId')
 
 Route.post('/posts', 'PostsController.create')
 
+Route.put('/posts/:postId', 'PostsController.edit')
+
 Route.delete('/posts/:id', 'PostsController.delete')
 
 Route.group(() => {

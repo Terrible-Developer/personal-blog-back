@@ -38,6 +38,32 @@ export default class PostsController {
         return postId
     }
 
+    public async edit(request: HttpContext) {
+      const data = request.request.requestBody
+
+      const post = await Post.findOrFail(request.params.postId);
+
+      // Update the post info
+      post.title = data.title;
+      post.content = data.content;
+
+      await post?.save().then(() => {
+        return { "Success": "Post " + data.title + "successfully updated!" }
+      });
+      /*
+        Testei isso mas ta mt secco
+        await Post
+        .query()
+        .where('id', request.params.postId)
+        .update(data)
+        .then(() => {
+          return { "Success": "Post " + data.title + "successfully updated!" }
+        }).catch(e => {
+          console.log(e)
+        return e
+        })*/
+    }
+
     public async delete(request: HttpContext) {
         const post = await Post.find(request.params.id)
         await post?.delete().then(() => {
