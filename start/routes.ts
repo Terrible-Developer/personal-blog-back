@@ -102,4 +102,6 @@ Route.get('/users/profile/:username', 'UsersController.showByUsername')
 
 Route.post('/users', 'UsersController.create')
 
+Route.put('/users/:id', 'UsersController.edit')
+
 Route.delete('/users/:id', 'UsersController.destroy')

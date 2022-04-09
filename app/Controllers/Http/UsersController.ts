@@ -26,6 +26,19 @@ export default class UsersController {
         return userId
     }
 
+    public async edit(request: HttpContext) {
+        const params: Parameters<string> = request.request.requestBody
+        const user: User = await User.find(request.params.id)
+        user.username = params.username ? params.username : user.username
+        user.password =  params.password ? params.password : user.password
+        user.email =  params.email ? params.email : user.email
+
+        const result = await user.save()
+
+        return result
+
+    }
+
     public async destroy(request: HttpContext) {
         const user = await User.find(request.params.id)
         await user?.delete().then(() => {
