@@ -50,19 +50,6 @@ export default class PostsController {
       await post?.save().then(() => {
         return { "Success": "Post " + data.title + "successfully updated!" }
       });
-
-      /*
-        Testei isso mas ta mt
-        await Post
-        .query()
-        .where('id', request.params.postId)
-        .update(data)
-        .then(() => {
-          return { "Success": "Post " + data.title + "successfully updated!" }
-        }).catch(e => {
-          console.log(e)
-        return e
-        })*/
     }
 
     public async delete(request: HttpContext) {
