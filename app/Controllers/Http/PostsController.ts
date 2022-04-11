@@ -32,7 +32,8 @@ export default class PostsController {
             .insert({
                 title: params.title,
                 content: params.content,
-                userid: params.userid
+                userid: params.userid,
+                likes_quantity: 0
             })
             .returning('id')
         return postId
@@ -71,10 +72,12 @@ export default class PostsController {
 
         if(!existsLikes){
             this.addLike(user.id.toString(), params.id)
+            this.updateLikes(params.id, 'like');
             returnValue = true
         }
         else{
             this.removeLike(user.id.toString(), params.id)
+            this.updateLikes(params.id, 'dislike');
             returnValue = false
         }
 
@@ -86,7 +89,6 @@ export default class PostsController {
         await auth.use('api').authenticate()
         const user: User = await auth.use('api').user!
         const postId = params.id
-
 
         const hasLiked = await Database
             .query()
@@ -116,5 +118,19 @@ export default class PostsController {
             .where('userid', userId)
             .andWhere('postid', postId)
         return dbResponse
+    }
+
+    private async updateLikes(postId: string, type: string) {
+      const post = await Post.findOrFail(postId)
+
+      // Process the like or dislike
+      if (type === 'like') {
+        post.likes_quantity++;
+      } else {
+        if (post.likes_quantity > 0)
+          post.likes_quantity--;
+      }
+
+      post.save()
     }
 }
