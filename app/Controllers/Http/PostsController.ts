@@ -4,16 +4,29 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import Post from 'App/Models/Post'
 import User from 'App/Models/User';
 import PostLike from 'App/Models/PostLike'
+import { getQueryStrings } from '../../../utils';
 
 export default class PostsController {
-    public async showAll() {
-        const posts = await Post.all()
-        return posts
+    public async showAll(request: HttpContext) {
+
+      const params = getQueryStrings(request.response.request.url);
+
+      // Counts all the posts to set the total pages
+      const postCount = (await Post.all()).length;
+      const posts = await Database.from("posts").paginate(params['page'], params['per_page']);
+
+      return { posts, totalPages: Math.ceil(postCount / params['per_page'])};
     }
 
     public async showAllByUserId(request: HttpContext) {
-        const posts = await Post.query().where('userid', request.params.userId)
-        return posts
+
+        const params = getQueryStrings(request.response.request.url);
+
+        const postCount = (await Post.query().where('userid', request.params.userId)).length;
+
+        const userPosts = await Post.query().where('userid', request.params.userId).paginate(params['page'], params['per_page']);
+
+        return { userPosts, totalPages: Math.ceil(postCount / params['per_page'])}
     }
 
     /*public async getFilteredPosts(request: HttpContext) {
