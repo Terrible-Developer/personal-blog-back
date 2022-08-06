@@ -1,33 +1,36 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import { DateTime } from "luxon";
+import { BaseModel, column, hasMany, HasMany } from "@ioc:Adonis/Lucid/Orm";
 
-import PostLike from './PostLike'
+import PostLike from "./PostLike";
 
 export default class Post extends BaseModel {
   @column({ isPrimary: true })
-  public id: number
+  public id: number;
 
   @column()
-  public title: string
+  public title: string;
 
   @column()
-  public content: string
+  public slug: string;
 
   @column()
-  public likes_quantity: number
+  public content: string;
 
   @column()
-  public tags: string[]
+  public likes_quantity: number;
 
-  @column({ columnName: 'userid' })
-  public userid: number
+  @column()
+  public tags: string[];
 
-  @hasMany(() => PostLike, { foreignKey: 'postId' })
-  public postLikes: HasMany<typeof PostLike>
+  @column({ columnName: "userid" })
+  public userid: number;
+
+  @hasMany(() => PostLike, { foreignKey: "postId" })
+  public postLikes: HasMany<typeof PostLike>;
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public createdAt: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updatedAt: DateTime;
 }

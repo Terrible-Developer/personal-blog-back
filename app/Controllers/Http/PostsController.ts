@@ -4,7 +4,7 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import Post from "App/Models/Post";
 import User from "App/Models/User";
 import PostLike from "App/Models/PostLike";
-import { getQueryStrings } from "../../../utils";
+import { getQueryStrings, convertToSlug } from "../../../utils";
 
 export default class PostsController {
   public async showAll(request: HttpContext) {
@@ -28,6 +28,7 @@ export default class PostsController {
 
     const userPosts = await Post.query()
       .where("userid", request.params.userId)
+      .orderBy("created_at", "desc")
       .paginate(params["page"], params["per_page"]);
 
     return { userPosts, totalPages: Math.ceil(postCount / params["per_page"]) };
@@ -47,6 +48,7 @@ export default class PostsController {
     const postId = await Database.table("posts")
       .insert({
         title: params.title,
+        slug: convertToSlug(params.title),
         content: params.content,
         userid: params.userid,
         likes_quantity: 0,
