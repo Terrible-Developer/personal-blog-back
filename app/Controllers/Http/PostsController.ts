@@ -1,10 +1,12 @@
 // import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { HttpContext } from "@adonisjs/http-server/build/standalone";
+import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
 import Post from "App/Models/Post";
 import User from "App/Models/User";
 import PostLike from "App/Models/PostLike";
 import { getQueryStrings, convertToSlug } from "../../../utils";
+import PostsValidator from "App/Validators/PostsValidator";
 
 export default class PostsController {
   public async showAll(request: HttpContext) {
@@ -43,12 +45,20 @@ export default class PostsController {
     return post;
   }
 
-  public async create(request: HttpContext) {
-    const params = request.request.requestBody;
+  public async showBySlug(request: HttpContext) {
+    const post = await Post.findBy("slug", request.params.slug);
+    return post;
+  }
+
+  public async create({ request }: HttpContextContract) {
+    const params = request.body();
+
+    await request.validate(PostsValidator);
+
     const postId = await Database.table("posts")
       .insert({
         title: params.title,
-        slug: convertToSlug(params.title),
+        slug: convertToSlug(params.slug),
         content: params.content,
         userid: params.userid,
         likes_quantity: 0,
@@ -57,17 +67,19 @@ export default class PostsController {
     return postId;
   }
 
-  public async edit(request: HttpContext) {
-    const data = request.request.requestBody;
+  public async edit({ request }: HttpContextContract) {
+    const body = request.body();
+    const params = request.params();
 
-    const post = await Post.findOrFail(request.params.postId);
+    const post = await Post.findOrFail(params.postId);
 
     // Update the post info
-    post.title = data.title;
-    post.content = data.content;
+    post.title = body.title;
+
+    post.content = body.content;
 
     await post?.save().then(() => {
-      return { Success: "Post " + data.title + "successfully updated!" };
+      return { Success: "Post " + body.title + "successfully updated!" };
     });
   }
 
