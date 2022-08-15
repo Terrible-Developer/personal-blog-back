@@ -7,6 +7,7 @@ import User from "App/Models/User";
 import PostLike from "App/Models/PostLike";
 import { getQueryStrings, convertToSlug } from "../../../utils";
 import PostsValidator from "App/Validators/PostsValidator";
+import PostComment from "App/Models/PostComment";
 
 export default class PostsController {
   public async showAll(request: HttpContext) {
@@ -159,5 +160,42 @@ export default class PostsController {
     }
 
     post.save();
+  }
+
+  /**
+   * List all comments for the posts
+   * @param HttpContextContract request
+   */
+  public async listPostComments({ request }: HttpContextContract) {
+    const params = request.params();
+
+    const postComments = await Database.from("post_comments")
+      .where("postId", params.postId)
+      .orderBy("created_at", "desc");
+
+    return postComments;
+  }
+
+  /**
+   * Comments the post
+   * @param HttpContextContract request
+   */
+  public async commentPost({ request, response }: HttpContextContract) {
+    const params = request.body();
+    const { content, userId, postId } = params;
+
+    const post = await Post.findOrFail(postId);
+
+    if (post) {
+      const postComment = await PostComment.create({
+        content: content,
+        postId: postId,
+        userid: userId,
+      });
+
+      return response
+        .status(200)
+        .json({ comment: content, success: "Comment successfully made!" });
+    }
   }
 }
