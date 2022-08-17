@@ -173,7 +173,7 @@ export default class PostsController {
       .where("postId", params.postId)
       .orderBy("created_at", "desc");
 
-    return postComments;
+    return { postComments, length: postComments.length };
   }
 
   /**
