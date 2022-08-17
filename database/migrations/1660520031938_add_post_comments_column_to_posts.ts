@@ -1,4 +1,4 @@
-import BaseSchema from "@ioc:Adonis/Lucid/Schema";
+/*import BaseSchema from "@ioc:Adonis/Lucid/Schema";
 
 export default class AddPostCommentsColumnToPosts extends BaseSchema {
   protected tableName = "posts";
@@ -15,3 +15,4 @@ export default class AddPostCommentsColumnToPosts extends BaseSchema {
     this.schema.dropTable(this.tableName);
   }
 }
+*/
