@@ -14,11 +14,16 @@ export default class PostsController {
 
     // Counts all the posts to set the total pages
     const postCount = (await Post.all()).length;
-    const posts = await Database.from("posts")
-      .orderBy("created_at", "desc")
-      .paginate(params["page"], params["per_page"]);
+    try {
+      const posts = await Database.from("posts")
+        .orderBy("created_at", "desc")
+        .paginate(params["page"], params["per_page"]);
 
-    return { posts, totalPages: Math.ceil(postCount / params["per_page"]) };
+      return { posts, totalPages: Math.ceil(postCount / params["per_page"]) };
+    }catch(e){
+      console.log(e);
+    }
+    return { posts: {}, totaPages: 0 };
   }
 
   public async showAllByUserId(request: HttpContext) {

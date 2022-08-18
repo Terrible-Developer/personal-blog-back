@@ -6,14 +6,17 @@ import slugify from "slugify";
  * @return Object containing all the queryStrings
  */
 export const getQueryStrings = (url: string | undefined): any => {
-  const splitUrl = String(url)?.split("?");
-  const params = splitUrl[1].split("&");
-  const strings = {};
-  params.forEach((q) => {
-    const s = q.split("=");
-    strings[s[0]] = Number(s[1]);
-  });
-  return strings;
+  if(url !== undefined && url.includes('?')){
+    const splitUrl = String(url)?.split("?");
+    const params = splitUrl[1].split("&");
+    const strings = {};
+    params.forEach((q) => {
+      const s = q.split("=");
+      strings[s[0]] = Number(s[1]);
+    });
+    return strings;
+  }
+  return undefined;
 };
 
 /**
