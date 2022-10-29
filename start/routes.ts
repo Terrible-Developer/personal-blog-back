@@ -22,7 +22,7 @@ import Route from "@ioc:Adonis/Core/Route";
 import HealthCheck from "@ioc:Adonis/Core/HealthCheck";
 import User from "App/Models/User";
 
-/*Testing and miscelaneous routes*/
+/*Testing, debug and miscelaneous routes*/
 
 Route.get("/", async () => {
   return { hello: "world" };
@@ -41,6 +41,17 @@ Route.get("/healthcheck", async ({ response }) => {
 
   return report.healthy ? response.ok(report) : response.badRequest(report);
 });
+
+/*Image Routes*/
+Route.post("/imagetest", async ({ request }) => {
+      const image = request.file('uploaded_image');
+      //pass.toController(image);
+
+      console.log(image);
+});
+
+Route.post("/imagetestroute", "ImagesController.uploadImageDEBUG");
+Route.post("/uploadsingleimage", "ImagesController.uploadSingleImage");
 
 /*Authentication Routes*/
 Route.post("/register", "AuthController.register");
