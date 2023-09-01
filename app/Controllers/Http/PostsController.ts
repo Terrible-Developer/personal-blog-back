@@ -133,9 +133,9 @@ export default class PostsController {
   }
 
   private async addLike(userId: string, postId: string) {
-    const postLike: PostLike = await PostLike.create({
-      postId: postId,
-      userId: userId,
+    await PostLike.create({
+      postId: postId as unknown as number,
+      userId: userId as unknown as number,
     });
     return "success";
   }
@@ -187,7 +187,7 @@ export default class PostsController {
     const post = await Post.findOrFail(postId);
 
     if (post) {
-      const postComment = await PostComment.create({
+      await PostComment.create({
         content: content,
         postId: postId,
         userid: userId,
@@ -197,5 +197,35 @@ export default class PostsController {
         .status(200)
         .json({ comment: content, success: "Comment successfully made!" });
     }
+  }
+
+  /**
+   * Comments the post
+   * @param HttpContextContract request
+   */
+  public async deleteCommentPost({ request, response }: HttpContextContract) {
+    const { commentId } = request.params();
+
+    //if (post) {
+    const postComment = await PostComment.findOrFail(commentId);
+
+    if (postComment) {
+      await postComment
+        .delete()
+        .then(() => {
+          return response.status(200).json({
+            commentId: commentId,
+            success: "Comment successfully deleted!",
+          });
+        })
+        .catch((e) => {
+          return e;
+        });
+    } else {
+      return response
+        .status(400)
+        .json({ commentId: commentId, error: "Not found" });
+    }
+    //}
   }
 }

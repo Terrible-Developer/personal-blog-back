@@ -112,3 +112,4 @@ Route.delete("/users/:id", "UsersController.destroy");
 // Post comments
 Route.get("/posts/comments/:postId", "PostsController.listPostComments");
 Route.post("/posts/comments", "PostsController.commentPost");
+Route.delete("/posts/comments/:commentId", "PostsController.deleteCommentPost");
