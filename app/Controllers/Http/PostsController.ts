@@ -26,21 +26,37 @@ export default class PostsController {
   public async showAllByUserId(request: HttpContext) {
     const params = getQueryStrings(request.response.request.url);
 
-    const postCount = (
-      await Post.query().where("userid", request.params.userId)
-    ).length;
+    const { search } = params;
 
-    const userPosts = await Post.query()
+    const query = Database.from("posts")
       .where("userid", request.params.userId)
-      .orderBy("created_at", "desc")
-      .paginate(params["page"], params["per_page"]);
+      .where(function () {
+        if (search) {
+          this.where("title", "ILIKE", `%${search}%`);
+        }
+      })
+      .orderBy("created_at", "desc");
 
-    return { userPosts, totalPages: Math.ceil(postCount / params["per_page"]) };
+    const userPosts = await query.paginate(params["page"], params["per_page"]);
+
+    let postCountQuery = Database.from("posts")
+      .where("userid", request.params.userId)
+      .where(function () {
+        if (search) {
+          this.where("title", "ILIKE", `%${search}%`);
+        }
+      })
+      .orderBy("created_at", "desc");
+
+    const postCountResult = await postCountQuery.count("posts");
+
+    return {
+      userPosts,
+      totalPages: Math.ceil(
+        Number(postCountResult[0]["count"]) / params["per_page"]
+      ),
+    };
   }
-
-  /*public async getFilteredPosts(request: HttpContext) {
-
-    }*/
 
   public async show(request: HttpContext) {
     const post = await Post.find(request.params.id);
