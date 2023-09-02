@@ -24,7 +24,7 @@ export default class AuthController {
 
             await auth.login(user)
 
-            return this.login({ request, response, auth })
+            return this.login({ request, response, auth });
         } catch(e) {
             return response.status(e.status | 500).send(e)
         }
@@ -36,7 +36,7 @@ export default class AuthController {
         return view.render('auth/login')
     }*/
 
-    public async login({ request, response, auth }: HttpContextContract) {
+    public async login({ request, response, auth }: HttpContextContract | any) {
         //return response.send('you tried to login as an user!')
         const { uid, password } = request.only(['uid', 'password'])
 

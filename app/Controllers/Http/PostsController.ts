@@ -7,6 +7,8 @@ import User from "App/Models/User";
 import PostLike from "App/Models/PostLike";
 import { getQueryStrings, convertToSlug } from "../../../utils";
 import PostsValidator from "App/Validators/PostsValidator";
+import PostComment from "App/Models/PostComment";
+import { subDays, format } from "date-fns";
 
 export default class PostsController {
   public async showAll(request: HttpContext) {
@@ -29,21 +31,37 @@ export default class PostsController {
   public async showAllByUserId(request: HttpContext) {
     const params = getQueryStrings(request.response.request.url);
 
-    const postCount = (
-      await Post.query().where("userid", request.params.userId)
-    ).length;
+    const { search } = params;
 
-    const userPosts = await Post.query()
+    const query = Database.from("posts")
       .where("userid", request.params.userId)
-      .orderBy("created_at", "desc")
-      .paginate(params["page"], params["per_page"]);
+      .where(function () {
+        if (search) {
+          this.where("title", "ILIKE", `%${search}%`);
+        }
+      })
+      .orderBy("created_at", "desc");
 
-    return { userPosts, totalPages: Math.ceil(postCount / params["per_page"]) };
+    const userPosts = await query.paginate(params["page"], params["per_page"]);
+
+    let postCountQuery = Database.from("posts")
+      .where("userid", request.params.userId)
+      .where(function () {
+        if (search) {
+          this.where("title", "ILIKE", `%${search}%`);
+        }
+      })
+      .orderBy("created_at", "desc");
+
+    const postCountResult = await postCountQuery.count("posts");
+
+    return {
+      userPosts,
+      totalPages: Math.ceil(
+        Number(postCountResult[0]["count"]) / params["per_page"]
+      ),
+    };
   }
-
-  /*public async getFilteredPosts(request: HttpContext) {
-
-    }*/
 
   public async show(request: HttpContext) {
     const post = await Post.find(request.params.id);
@@ -137,9 +155,9 @@ export default class PostsController {
   }
 
   private async addLike(userId: string, postId: string) {
-    const postLike: PostLike = await PostLike.create({
-      postId: postId,
-      userId: userId,
+    await PostLike.create({
+      postId: postId as unknown as number,
+      userId: userId as unknown as number,
     });
     return "success";
   }
@@ -164,5 +182,78 @@ export default class PostsController {
     }
 
     post.save();
+  }
+
+  /**
+   * List all comments for the posts
+   * @param HttpContextContract request
+   */
+  public async listPostComments({ request }: HttpContextContract) {
+    const params = request.params();
+
+    const oneDayAgo = subDays(new Date(), 1); // Calculate the date 1 day ago
+
+    const formattedOneDayAgo = format(oneDayAgo, "yyyy-MM-dd HH:mm:ss"); // Format the date as a string in the same format as your "created_at" column
+
+    const postComments = await Database.from("post_comments")
+      .select("*") // Select all columns
+      .where("postId", params.postId)
+      .where("created_at", ">", formattedOneDayAgo)
+      .orderBy("created_at", "desc");
+
+    return { postComments, length: postComments.length };
+  }
+
+  /**
+   * Comments the post
+   * @param HttpContextContract request
+   */
+  public async commentPost({ request, response }: HttpContextContract) {
+    const params = request.body();
+    const { content, userId, postId } = params;
+
+    const post = await Post.findOrFail(postId);
+
+    if (post) {
+      await PostComment.create({
+        content: content,
+        postId: postId,
+        userid: userId,
+      });
+
+      return response
+        .status(200)
+        .json({ comment: content, success: "Comment successfully made!" });
+    }
+  }
+
+  /**
+   * Comments the post
+   * @param HttpContextContract request
+   */
+  public async deleteCommentPost({ request, response }: HttpContextContract) {
+    const { commentId } = request.params();
+
+    //if (post) {
+    const postComment = await PostComment.findOrFail(commentId);
+
+    if (postComment) {
+      await postComment
+        .delete()
+        .then(() => {
+          return response.status(200).json({
+            commentId: commentId,
+            success: "Comment successfully deleted!",
+          });
+        })
+        .catch((e) => {
+          return e;
+        });
+    } else {
+      return response
+        .status(400)
+        .json({ commentId: commentId, error: "Not found" });
+    }
+    //}
   }
 }

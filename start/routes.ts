@@ -108,3 +108,8 @@ Route.post("/users", "UsersController.create");
 Route.put("/users/:id", "UsersController.edit");
 
 Route.delete("/users/:id", "UsersController.destroy");
+
+// Post comments
+Route.get("/posts/comments/:postId", "PostsController.listPostComments");
+Route.post("/posts/comments", "PostsController.commentPost");
+Route.delete("/posts/comments/:commentId", "PostsController.deleteCommentPost");
