@@ -8,6 +8,7 @@ import PostLike from "App/Models/PostLike";
 import { getQueryStrings, convertToSlug } from "../../../utils";
 import PostsValidator from "App/Validators/PostsValidator";
 import PostComment from "App/Models/PostComment";
+import { subDays, format } from "date-fns";
 
 export default class PostsController {
   public async showAll(request: HttpContext) {
@@ -169,8 +170,14 @@ export default class PostsController {
   public async listPostComments({ request }: HttpContextContract) {
     const params = request.params();
 
+    const oneDayAgo = subDays(new Date(), 1); // Calculate the date 1 day ago
+
+    const formattedOneDayAgo = format(oneDayAgo, "yyyy-MM-dd HH:mm:ss"); // Format the date as a string in the same format as your "created_at" column
+
     const postComments = await Database.from("post_comments")
+      .select("*") // Select all columns
       .where("postId", params.postId)
+      .where("created_at", ">", formattedOneDayAgo)
       .orderBy("created_at", "desc");
 
     return { postComments, length: postComments.length };
