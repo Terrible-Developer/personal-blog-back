@@ -33,33 +33,41 @@ export default class PostsController {
 
     const { search } = params;
 
-    const query = Database.from("posts")
-      .where("userid", request.params.userId)
-      .where(function () {
-        if (search) {
-          this.where("title", "ILIKE", `%${search}%`);
-        }
-      })
-      .orderBy("created_at", "desc");
+    const postsQuery = Database.from("posts").where(
+      "userid",
+      request.params.userId
+    );
 
-    const userPosts = await query.paginate(params["page"], params["per_page"]);
+    // Apply the search filter
+    if (search) {
+      postsQuery.where("title", "ILIKE", `%${search}%`);
+    }
 
-    let postCountQuery = Database.from("posts")
-      .where("userid", request.params.userId)
-      .where(function () {
-        if (search) {
-          this.where("title", "ILIKE", `%${search}%`);
-        }
-      })
-      .orderBy("created_at", "desc");
+    // Query to count the posts (without ordering)
+    let postCountQuery = Database.from("posts").where(
+      "userid",
+      request.params.userId
+    );
+
+    // Apply the search filter to the count query
+    if (search) {
+      postCountQuery.where("title", "ILIKE", `%${search}%`);
+    }
+
+    const userPosts = await postsQuery
+      .orderBy("created_at", "desc")
+      .paginate(
+        params["page"],
+        params["per_page"]
+    );
 
     const postCountResult = await postCountQuery.count("posts");
 
+    console.log(postCountResult);
+
     return {
       userPosts,
-      totalPages: Math.ceil(
-        Number(postCountResult[0]["count"]) / params["per_page"]
-      ),
+      totalPages: Math.ceil(postCountResult[0]["count"] / params["per_page"]),
     };
   }
 
