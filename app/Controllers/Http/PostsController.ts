@@ -22,7 +22,7 @@ export default class PostsController {
         .paginate(params["page"], params["per_page"]);
 
       return { posts, totalPages: Math.ceil(postCount / params["per_page"]) };
-    }catch(e){
+    } catch (e) {
       console.log(e);
     }
     return { posts: {}, totaPages: 0 };
@@ -56,10 +56,7 @@ export default class PostsController {
 
     const userPosts = await postsQuery
       .orderBy("created_at", "desc")
-      .paginate(
-        params["page"],
-        params["per_page"]
-    );
+      .paginate(params["page"], params["per_page"]);
 
     const postCountResult = await postCountQuery.count("posts");
 
@@ -79,8 +76,10 @@ export default class PostsController {
     return post;
   }
 
-  public async create({ request }: HttpContextContract) {
+  public async create({ request, auth }: HttpContextContract) {
     const params = request.body();
+
+    await auth.use("api").authenticate();
 
     await request.validate(PostsValidator);
 
@@ -96,16 +95,15 @@ export default class PostsController {
     return postId;
   }
 
-  public async edit({ request, auth }: HttpContextContract) {
+  public async edit({ request, params, auth }: HttpContextContract) {
     const body = request.body();
-    const params = request.params();
 
-    const post = await Post.findOrFail(params.postId);
+    await auth.use("api").authenticate();
 
-    // Update the post info
-    post.title = body.title;
+    const post = await Post.findOrFail(Number(params.postId));
 
-    post.content = body.content;
+    const updatedData = request.only(["title", "content"]);
+    post.merge(updatedData);
 
     await post?.save().then(() => {
       return { Success: "Post " + body.title + "successfully updated!" };
@@ -240,7 +238,11 @@ export default class PostsController {
    * Comments the post
    * @param HttpContextContract request
    */
-  public async deleteCommentPost({ request, response, auth }: HttpContextContract) {
+  public async deleteCommentPost({
+    request,
+    response,
+    auth,
+  }: HttpContextContract) {
     const { commentId } = request.params();
 
     await auth.use("api").authenticate();
