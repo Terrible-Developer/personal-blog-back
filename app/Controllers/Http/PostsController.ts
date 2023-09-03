@@ -196,12 +196,12 @@ export default class PostsController {
   public async listPostComments({ request }: HttpContextContract) {
     const params = request.params();
 
-    const oneDayAgo = subDays(new Date(), 1); // Calculate the date 1 day ago
+    const oneDayAgo = subDays(new Date(), 1);
 
-    const formattedOneDayAgo = format(oneDayAgo, "yyyy-MM-dd HH:mm:ss"); // Format the date as a string in the same format as your "created_at" column
+    const formattedOneDayAgo = format(oneDayAgo, "yyyy-MM-dd HH:mm:ss");
 
     const postComments = await Database.from("post_comments")
-      .select("*") // Select all columns
+      .select("*")
       .where("postId", params.postId)
       .where("created_at", ">", formattedOneDayAgo)
       .orderBy("created_at", "desc");
