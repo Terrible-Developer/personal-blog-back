@@ -63,8 +63,6 @@ export default class PostsController {
 
     const postCountResult = await postCountQuery.count("posts");
 
-    console.log(postCountResult);
-
     return {
       userPosts,
       totalPages: Math.ceil(postCountResult[0]["count"] / params["per_page"]),
@@ -76,8 +74,8 @@ export default class PostsController {
     return post;
   }
 
-  public async showBySlug(request: HttpContext) {
-    const post = await Post.findBy("slug", request.params.slug);
+  public async showBySlug({ params }: HttpContextContract) {
+    const post = await Post.findBy("slug", params.slug);
     return post;
   }
 
@@ -98,7 +96,7 @@ export default class PostsController {
     return postId;
   }
 
-  public async edit({ request }: HttpContextContract) {
+  public async edit({ request, auth }: HttpContextContract) {
     const body = request.body();
     const params = request.params();
 
@@ -114,8 +112,9 @@ export default class PostsController {
     });
   }
 
-  public async delete(request: HttpContext) {
-    const post = await Post.find(request.params.id);
+  public async delete({ params, auth }: HttpContextContract) {
+    await auth.use("api").authenticate();
+    const post = await Post.find(params.id);
     await post
       ?.delete()
       .then(() => {
@@ -216,9 +215,11 @@ export default class PostsController {
    * Comments the post
    * @param HttpContextContract request
    */
-  public async commentPost({ request, response }: HttpContextContract) {
+  public async commentPost({ request, response, auth }: HttpContextContract) {
     const params = request.body();
     const { content, userId, postId } = params;
+
+    await auth.use("api").authenticate();
 
     const post = await Post.findOrFail(postId);
 
@@ -239,8 +240,10 @@ export default class PostsController {
    * Comments the post
    * @param HttpContextContract request
    */
-  public async deleteCommentPost({ request, response }: HttpContextContract) {
+  public async deleteCommentPost({ request, response, auth }: HttpContextContract) {
     const { commentId } = request.params();
+
+    await auth.use("api").authenticate();
 
     //if (post) {
     const postComment = await PostComment.findOrFail(commentId);
