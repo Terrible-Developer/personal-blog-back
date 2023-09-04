@@ -2,6 +2,7 @@ import { DateTime } from "luxon";
 import { BaseModel, column, hasMany, HasMany } from "@ioc:Adonis/Lucid/Orm";
 
 import PostLike from "./PostLike";
+import PostComment from "./PostComment";
 
 export default class Post extends BaseModel {
   @column({ isPrimary: true })
@@ -27,6 +28,9 @@ export default class Post extends BaseModel {
 
   @hasMany(() => PostLike, { foreignKey: "postId" })
   public postLikes: HasMany<typeof PostLike>;
+
+  @hasMany(() => PostComment, { foreignKey: "postId" })
+  public postComments: HasMany<typeof PostComment>;
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime;
