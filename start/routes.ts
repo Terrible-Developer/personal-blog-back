@@ -43,15 +43,9 @@ Route.get("/healthcheck", async ({ response }) => {
 });
 
 /*Image Routes*/
-Route.post("/imagetest", async ({ request }) => {
-      const image = request.file('uploaded_image');
-      //pass.toController(image);
-
-      console.log(image);
-});
-
 Route.post("/imagetestroute", "ImagesController.uploadImageDEBUG");
 Route.post("/uploadsingleimage", "ImagesController.uploadSingleImage");
+Route.get("/getimagetest", "ImagesController.getImage");
 
 /*Authentication Routes*/
 Route.post("/register", "AuthController.register");
